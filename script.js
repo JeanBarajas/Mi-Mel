@@ -1,11 +1,11 @@
-/* ================== TEXTO DE LA CARTA ================== */
+/* Texto de la carta. Puedes editarlo aquí sin tocar el diseño. */
 const LETTER_TEXT = `No sé si alguna vez encontré la forma exacta de hacerte entender lo mucho que me gustabas. Tal vez no siempre supe demostrarlo de la manera que merecías, pero quiero que tengas algo muy claro: lo que sentí por ti fue real.
 
 Me encantaste. Me gustó tu forma de ser, tu manera de pensar, tu inteligencia, tu independencia y ese lado cariñoso que fui descubriendo poco a poco. Me parecías —y me sigues pareciendo— una mujer preciosa, por fuera y por dentro. Tienes tantas de esas cualidades que siempre he admirado y que quisiera encontrar en una compañera de vida, que más de una vez me imaginé cómo sería compartir contigo mucho más que conversaciones a la distancia.
 
 Y sí, me habría encantado conocerte, abrazarte, salir contigo y descubrir cómo sería estar juntos en persona. No eras simplemente alguien con quien hablaba para pasar el rato. Me ilusionaba saber de ti, compartir mis días contigo y sentirte cerca, incluso estando tan lejos. Me acompañaste durante todo este tiempo de una forma que quizá no alcanzas a dimensionar, y hubo momentos en los que hiciste mis días mucho más bonitos sin siquiera proponértelo.
 
-Si alguna vez te preguntaste qué quería contigo, o si de verdad había un interés de mi parte, quiero despejar esa duda: sí lo había. Me gustabas muchísimo y tenía ilusión de que algún día pudiéramos convertir todo esto en algo real. No puedo decirte que sabía cómo iba a salir, porque la verdad es que nunca tuvimos la oportunidad de descubrirlo pero sí sé que quería intentarlo y que mi interés no era un juego ni algo pasajero.
+Si alguna vez te preguntaste qué quería contigo, o si de verdad había un interés de mi parte, quiero despejar esa duda: sí lo había. Me gustabas muchísimo y tenía ilusión de que algún día pudiéramos convertir todo esto en algo real. No puedo decirte que sabía cómo iba a salir, porque la verdad es que nunca tuvimos la oportunidad de descubrirlo, pero sí sé que quería intentarlo y que mi interés no era un juego ni algo pasajero.
 
 También entiendo que la distancia pesa. Barranquilla y Bogotá no son precisamente cerca, y por más bonito que sea lo que uno siente, mantener una conexión así puede volverse difícil. Entiendo que te hayas cansado de sentir que eras tú quien insistía, y no quiero que te quedes con la sensación de que no me importabas o de que estabas sintiendo algo sola. Lamento si mis silencios, mis tiempos o mi manera de estar presente te hicieron dudar de eso. Quizá no supe cuidar esta conexión como debía.
 
@@ -17,349 +17,211 @@ Gracias por acompañarme durante este tiempo, por tus conversaciones, tu cariño
 
 Te quiero mucho, mucho, mucho mi Mel. ❤️
 
-Jean `;
+Jean`;
 
-/* ================== REFERENCIAS DEL DOM ================== */
-const openBtn = document.getElementById('openBtn');
-const envelope = document.getElementById('envelope');
-const letter = document.getElementById('letter');
-const letterBody = document.getElementById('letterBody');
-const replayBtn = document.getElementById('replay');
+const WHISPER_TEXT = "Gracias por haber llegado a mi vida, aunque haya sido a la distancia. ❤️";
+const TYPE_SPEED_MS = 22;
+const PARAGRAPH_PAUSE_MS = 260;
 
-/* si no existe un sello, créalo */
-(() => {
-  if (envelope && !document.querySelector('.seal')) {
-    const seal = document.createElement('div');
-    seal.className = 'seal';
-    envelope.appendChild(seal);
-  }
-})();
+const openBtn = document.getElementById("openBtn");
+const envelope = document.getElementById("envelope");
+const letter = document.getElementById("letter");
+const letterBody = document.getElementById("letterBody");
+const replayBtn = document.getElementById("replay");
+const showAllBtn = document.getElementById("showAll");
+const letterEnding = document.getElementById("letterEnding");
 
-/* ================== TIPEO (lento, con pausas seguras) ================== */
-const TYPE_SPEED_MS = 55;          // Ajusta para más lento/rápido
-const PARAGRAPH_PAUSE_MS = 500;    // Pausa extra al final de cada párrafo
-const WHISPER_TEXT = 'Gracias por haber llegado a mi vida, aunque haya sido a la distancia. ❤️';
-
-let typingTimeout = null;
+let typingTimer = null;
 let typedIndex = 0;
 let whisperEl = null;
+let isTyping = false;
 
-function clearTypingTimers(){
-  if (typingTimeout) { clearTimeout(typingTimeout); typingTimeout = null; }
+const paragraphBreaks = new Set();
+for (const match of LETTER_TEXT.matchAll(/\n\n/g)) {
+  paragraphBreaks.add(match.index + match[0].length);
 }
 
-function resetLetter(){
-  clearTypingTimers();
+function clearTyping() {
+  if (typingTimer) clearTimeout(typingTimer);
+  typingTimer = null;
+  isTyping = false;
+}
+
+function clearLetter() {
+  clearTyping();
   typedIndex = 0;
-  letterBody.textContent = '';
-  if (whisperEl){ whisperEl.remove(); whisperEl = null; }
-}
-
-function getParagraphBreakIndices(text){
-  const breaks = [];
-  const rx = /\r?\n\r?\n/g;
-  let m;
-  while ((m = rx.exec(text)) !== null){
-    breaks.push(m.index + m[0].length);
+  letterBody.textContent = "";
+  letterEnding.hidden = true;
+  if (whisperEl) {
+    whisperEl.remove();
+    whisperEl = null;
   }
-  return new Set(breaks);
+  if (showAllBtn) showAllBtn.hidden = false;
 }
-const paragraphBreaks = getParagraphBreakIndices(LETTER_TEXT);
 
-function showWhisper(){
-  whisperEl = document.createElement('div');
-  whisperEl.className = 'whisper';
+function finishLetter() {
+  clearTyping();
+  letterBody.textContent = LETTER_TEXT;
+  letterEnding.hidden = false;
+  if (showAllBtn) showAllBtn.hidden = true;
+  whisperEl = document.createElement("p");
+  whisperEl.className = "closing-whisper";
   whisperEl.textContent = WHISPER_TEXT;
+  whisperEl.style.cssText = "margin:18px 0 0;text-align:center;color:#827b73;font-style:italic;font-size:.95rem;";
   letterBody.appendChild(whisperEl);
-  requestAnimationFrame(()=> { whisperEl.style.opacity = 1; });
 }
 
-function stepType(){
-  letterBody.textContent = LETTER_TEXT.slice(0, typedIndex++);
-  if (typedIndex > LETTER_TEXT.length){
-    typingTimeout = setTimeout(showWhisper, 450);
+function typeNext() {
+  if (typedIndex >= LETTER_TEXT.length) {
+    finishLetter();
     return;
   }
-  const isParagraphEnd = paragraphBreaks.has(typedIndex);
-  const delay = isParagraphEnd ? PARAGRAPH_PAUSE_MS : TYPE_SPEED_MS;
-  typingTimeout = setTimeout(stepType, delay);
+  typedIndex += 1;
+  letterBody.textContent = LETTER_TEXT.slice(0, typedIndex);
+
+  const pause = paragraphBreaks.has(typedIndex) ? PARAGRAPH_PAUSE_MS : TYPE_SPEED_MS;
+  typingTimer = setTimeout(typeNext, pause);
 }
 
-function startTyping(){
-  clearTypingTimers();
-  typedIndex = 0;
-  letterBody.textContent = '';
-  if (whisperEl){ whisperEl.remove(); whisperEl = null; }
-  typingTimeout = setTimeout(stepType, TYPE_SPEED_MS);
+function startTyping() {
+  clearLetter();
+  isTyping = true;
+  typingTimer = setTimeout(typeNext, 220);
 }
 
-/* ================== EVENTO UNIVERSAL (fix iPhone) ================== */
-const OPEN_EVT = window.PointerEvent ? 'pointerup' :
-                 ('ontouchend' in window ? 'touchend' : 'click');
-
-let lastTap = 0;
-function handleOpen(e){
-  const now = Date.now();
-  if (now - lastTap < 350) return; // evita doble-disparo (touch + click)
-  lastTap = now;
-
-  if (e && typeof e.preventDefault === 'function') e.preventDefault();
-
-  const opened = envelope.classList.toggle('open');
-  openBtn.setAttribute('aria-expanded', opened ? 'true' : 'false');
-  if (opened) {
-    startTyping();
-    setTimeout(()=> letter.focus(), 900);
-    // "pop" sutil
-    targetTZ = MAX_TZ;
-    setTimeout(()=> targetTZ = 0, 600);
-  } else {
-    resetLetter();
-  }
-}
-openBtn.addEventListener(OPEN_EVT, handleOpen, { passive: true });
-openBtn.addEventListener('click', handleOpen, { passive: true }); // fallback
-
-/* Reproducir de nuevo */
-if (replayBtn){
-  const handleReplay = (e)=>{
-    const now = Date.now();
-    if (now - lastTap < 300) return;
-    lastTap = now;
-    if (e && typeof e.preventDefault === 'function') e.preventDefault();
-
-    resetLetter();
-    if (!envelope.classList.contains('open')) envelope.classList.add('open');
-    startTyping();
-  };
-  const REPLAY_EVT = window.PointerEvent ? 'pointerup' :
-                     ('ontouchend' in window ? 'touchend' : 'click');
-  replayBtn.addEventListener(REPLAY_EVT, handleReplay, { passive:true });
-  replayBtn.addEventListener('click', handleReplay, { passive:true });
+function openLetter() {
+  if (envelope.classList.contains("open")) return;
+  envelope.classList.add("open");
+  openBtn.setAttribute("aria-expanded", "true");
+  openBtn.textContent = "Carta abierta ❤️";
+  startTyping();
+  window.setTimeout(() => {
+    letter.focus({ preventScroll: true });
+  }, 500);
 }
 
-/* Auto-open por query ?open=1 */
-(function(){
-  const params = new URLSearchParams(location.search);
-  if (params.get('open') === '1'){
-    envelope.classList.add('open');
-    setTimeout(startTyping, 500);
-  }
-})();
+function replayLetter() {
+  if (!envelope.classList.contains("open")) openLetter();
+  else startTyping();
+  letter.scrollTop = 0;
+}
 
-/* ================== CIELO: ESTRELLAS + COMETA + LOOP ÚNICO ================== */
-(function(){
-  const canvas = document.getElementById('stars');
+openBtn.addEventListener("click", openLetter);
+replayBtn.addEventListener("click", replayLetter);
+showAllBtn.addEventListener("click", () => {
+  if (!envelope.classList.contains("open")) openLetter();
+  finishLetter();
+});
+
+/* Cielo de estrellas: ligero y adaptado al tamaño de pantalla. */
+(() => {
+  const canvas = document.getElementById("stars");
   if (!canvas) return;
-  const ctx = canvas.getContext('2d', { alpha: true });
+  const ctx = canvas.getContext("2d");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let width = 0, height = 0, dpr = 1, stars = [], raf = null, last = 0;
+  let comet = null, cometCountdown = 8;
 
-  const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+  const random = (min, max) => Math.random() * (max - min) + min;
 
-  let W = 0, H = 0, dpr = 1;
-
-  // Estrellas
-  const DENSITY = 12000;
-  const MAX_STARS = 240;
-  const MIN_R = 0.25;
-  const MAX_R = 1.4;
-  const BASE_ALPHA = 0.35;
-  const TWINKLE_AMPL = 0.75;
-  const RENEW_PROB = 0.06;
-  let stars = [];
-
-  // Cometa
-  let comet = null; // {x,y,vx,vy,life,max,thickness}
-  let nextCometIn = 0;
-
-  function rnd(a, b) { return Math.random() * (b - a) + a; }
-
-  function resize(){
-    const rect = canvas.getBoundingClientRect();
-    dpr = Math.max(1, window.devicePixelRatio || 1);
-    canvas.width  = Math.floor(rect.width  * dpr);
-    canvas.height = Math.floor(rect.height * dpr);
-    canvas.style.width  = rect.width + 'px';
-    canvas.style.height = rect.height + 'px';
-    W = canvas.width; H = canvas.height;
-
-    const count = Math.min(MAX_STARS, Math.max(90, Math.floor((W * H) / DENSITY)));
-    stars = Array.from({ length: count }, () => spawnStar());
-
-    scheduleNextComet();
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const count = Math.min(170, Math.max(65, Math.floor(width * height / 6500)));
+    stars = Array.from({ length: count }, () => ({
+      x: random(0, width), y: random(0, height),
+      r: random(.35, 1.35), phase: random(0, Math.PI * 2),
+      speed: random(.35, 1.0), alpha: random(.25, .8)
+    }));
+    drawStatic();
   }
 
-  function spawnStar(){
-    const speed = rnd(0.35, 1.1); // rad/s
-    const phase = rnd(0, Math.PI * 2);
-    return {
-      x: Math.random() * W,
-      y: Math.random() * H,
-      r: rnd(MIN_R, MAX_R),
-      baseA: BASE_ALPHA,
-      ampl: TWINKLE_AMPL,
-      speed,
-      phase,
-      hue: 220 + rnd(-8, 14),
+  function drawStatic() {
+    ctx.clearRect(0, 0, width, height);
+    for (const star of stars) {
+      ctx.globalAlpha = star.alpha;
+      ctx.fillStyle = "#e3e9ff";
+      ctx.beginPath();
+      ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function spawnComet() {
+    const fromLeft = Math.random() > .5;
+    comet = {
+      x: fromLeft ? -30 : width + 30,
+      y: random(30, height * .55),
+      vx: fromLeft ? random(180, 260) : -random(180, 260),
+      vy: random(55, 105),
+      life: 0,
+      duration: random(1.5, 2.2)
     };
   }
 
-  function scheduleNextComet(){
-    nextCometIn = prefersReduced ? Infinity : (8 + Math.random()*10);
-  }
+  function frame(time) {
+    if (!last) last = time;
+    const dt = Math.min((time - last) / 1000, .04);
+    last = time;
+    ctx.clearRect(0, 0, width, height);
 
-  function spawnComet(){
-    const margin = 80 * dpr;
-    const side = Math.floor(Math.random()*4);
-    let x, y, vx, vy;
-    const speed = (Math.random()*0.6 + 0.7) * dpr * 250; // px/s
-
-    if (side === 0){ x = Math.random() * W; y = -margin; const a = (Math.random() * Math.PI/3) + Math.PI/6; vx = Math.cos(a)*speed; vy = Math.sin(a)*speed; }
-    else if (side === 1){ x = W+margin; y = Math.random() * H; const a = Math.PI + Math.random()*(Math.PI/3) + Math.PI/6; vx = Math.cos(a)*speed; vy = Math.sin(a)*speed; }
-    else if (side === 2){ x = Math.random() * W; y = H+margin; const a = - (Math.random() * Math.PI/3 + Math.PI/6); vx = Math.cos(a)*speed; vy = Math.sin(a)*speed; }
-    else { x = -margin; y = Math.random() * H; const a = (Math.random() * Math.PI/3) - Math.PI/6; vx = Math.cos(a)*speed; vy = Math.sin(a)*speed; }
-
-    comet = { x, y, vx, vy, life:0, max: Math.random()*1.2 + 1.8, thickness: Math.random()*0.6 + 0.9 };
-  }
-
-  // Animación
-  let rafId = null;
-  let last = performance.now();
-
-  function frame(now){
-    const dt = Math.min(0.05, (now - last)/1000);
-    last = now;
-
-    ctx.clearRect(0,0,W,H);
-
-    // Estrellas
-    for (let i=0; i<stars.length; i++){
-      const s = stars[i];
-      s.phase += s.speed * dt;
-      const tw = Math.cos(s.phase) ** 2;
-      let alpha = s.baseA + s.ampl * (tw - 0.5) * 2;
-      alpha = Math.max(0, Math.min(1, alpha));
-
-      if (alpha < 0.04 && Math.random() < RENEW_PROB){
-        stars[i] = spawnStar();
-        continue;
-      }
-
-      ctx.globalAlpha = alpha;
+    for (const star of stars) {
+      star.phase += star.speed * dt;
+      ctx.globalAlpha = Math.max(.12, star.alpha * (.55 + .45 * Math.cos(star.phase)));
+      ctx.fillStyle = "#e3e9ff";
       ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-      ctx.fillStyle = `hsl(${s.hue} 100% 85%)`;
+      ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
       ctx.fill();
     }
+    ctx.globalAlpha = 1;
 
-    // Cometa
-    if (comet){
+    if (comet) {
       comet.life += dt;
       comet.x += comet.vx * dt;
       comet.y += comet.vy * dt;
-
-      const vlen = Math.hypot(comet.vx, comet.vy) || 1;
-      const trailLen = 180 * dpr;
-      const tailX = comet.x - (comet.vx / vlen) * trailLen;
-      const tailY = comet.y - (comet.vy / vlen) * trailLen;
-
-      const grad = ctx.createLinearGradient(comet.x, comet.y, tailX, tailY);
-      grad.addColorStop(0, 'rgba(255,255,255,0.85)');
-      grad.addColorStop(1, 'rgba(170,200,255,0)');
-
-      ctx.save();
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.lineWidth = comet.thickness;
-      ctx.strokeStyle = grad;
+      const tailX = comet.x - Math.sign(comet.vx) * 95;
+      const tailY = comet.y - 35;
+      const gradient = ctx.createLinearGradient(comet.x, comet.y, tailX, tailY);
+      gradient.addColorStop(0, "rgba(255,255,255,.85)");
+      gradient.addColorStop(1, "rgba(180,200,255,0)");
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(comet.x, comet.y);
       ctx.lineTo(tailX, tailY);
       ctx.stroke();
-
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(230,240,255,0.85)';
-      ctx.arc(comet.x, comet.y, 1.4*dpr, 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-
-      if (comet.life > comet.max ||
-          comet.x < -200*dpr || comet.x > W + 200*dpr ||
-          comet.y < -200*dpr || comet.y > H + 200*dpr){
-        comet = null;
-      }
+      if (comet.life > comet.duration || comet.x < -150 || comet.x > width + 150) comet = null;
     } else {
-      nextCometIn -= dt;
-      if (nextCometIn <= 0){ spawnComet(); scheduleNextComet(); }
-    }
-
-    // Parallax envelope
-    curRX = lerp(curRX, targetRX, 0.08);
-    curRY = lerp(curRY, targetRY, 0.08);
-    curTZ = lerp(curTZ, targetTZ, 0.08);
-    envelope.style.transform = `translateZ(${curTZ}px) rotateX(${curRX}deg) rotateY(${curRY}deg)`;
-
-    rafId = requestAnimationFrame(frame);
-  }
-
-  function start(){
-    if (rafId) cancelAnimationFrame(rafId);
-    last = performance.now();
-    rafId = requestAnimationFrame(frame);
-  }
-  function stop(){
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = null;
-  }
-
-  window.addEventListener('resize', ()=>{ stop(); resize(); start(); }, {passive:true});
-  resize();
-  if (!prefersReduced){ start(); }
-  else {
-    // Dibujo estático
-    ctx.clearRect(0,0,W,H);
-    for (const s of stars){
-      ctx.globalAlpha = s.baseA;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-      ctx.fillStyle = `hsl(${s.hue} 100% 85%)`;
-      ctx.fill();
-    }
-  }
-  document.addEventListener('visibilitychange', ()=>{ if (document.hidden) stop(); else start(); });
-})();
-
-/* ================== PARALLAX (mouse + gyro) ================== */
-const MAX_ROT_X = 6;  // grados
-const MAX_ROT_Y = 8;  // grados
-const MAX_TZ = 14;    // px "pop"
-let targetRX = 0, targetRY = 0, targetTZ = 0;
-let curRX = 0, curRY = 0, curTZ = 0;
-
-function lerp(a,b,t){ return a + (b-a)*t; }
-
-(function(){
-  const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
-  if (prefersReduced) return;
-
-  window.addEventListener('mousemove', (e)=>{
-    const rect = envelope.getBoundingClientRect();
-    const cx = rect.left + rect.width/2;
-    const cy = rect.top + rect.height/2;
-    const nx = (e.clientX - cx) / (rect.width/2);   // -1..1
-    const ny = (e.clientY - cy) / (rect.height/2);  // -1..1
-    targetRY = -nx * MAX_ROT_Y;
-    targetRX =  ny * MAX_ROT_X;
-    targetTZ = (1 - Math.min(1, Math.hypot(nx,ny))) * MAX_TZ;
-  }, {passive:true});
-
-  if (window.DeviceOrientationEvent){
-    window.addEventListener('deviceorientation', (ev)=>{
-      if (typeof ev.beta === 'number' && typeof ev.gamma === 'number'){
-        const nx = Math.max(-1, Math.min(1, (ev.gamma || 0) / 45));
-        const ny = Math.max(-1, Math.min(1, (ev.beta  || 0) / 45));
-        targetRY = -nx * MAX_ROT_Y;
-        targetRX =  ny * MAX_ROT_X;
-        targetTZ = (1 - Math.min(1, Math.hypot(nx,ny))) * MAX_TZ;
+      cometCountdown -= dt;
+      if (cometCountdown <= 0) {
+        spawnComet();
+        cometCountdown = random(12, 20);
       }
-    }, {passive:true});
+    }
+
+    raf = requestAnimationFrame(frame);
   }
+
+  function start() {
+    if (reduceMotion || document.hidden || raf) return;
+    last = 0;
+    raf = requestAnimationFrame(frame);
+  }
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = null;
+  }
+
+  resize();
+  if (!reduceMotion) start();
+  window.addEventListener("resize", () => { stop(); resize(); start(); }, { passive: true });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stop();
+    else start();
+  });
 })();
