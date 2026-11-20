@@ -1,75 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
-  
-
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Lo que quiero que sepas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e1018" />
+  <meta name="description" content="Hay cosas que merecen decirse con el corazón." />
+  <title>Para ti, mi Mel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital@0;1&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=4">
-  
-  <meta name="description" content="Hay cosas que merecen decirse."/>
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="stage" aria-label="Carta animada">
-    <!-- Fondo con grano sutil y estrellas -->
+  <main class="stage">
     <div class="sky" aria-hidden="true">
       <canvas id="stars"></canvas>
       <div class="grain"></div>
+      <div class="moon-glow"></div>
     </div>
 
-    <!-- Contenido -->
-    <section class="card-wrap">
-      <button class="open-btn" id="openBtn" aria-expanded="false" aria-controls="envelope" title="Abrir carta">
-       Hay algo que quiero que sepas 🌙
+    <section class="card-wrap" aria-label="Una carta para Mel">
+      <div class="intro">
+        <p class="eyebrow">UNAS PALABRAS PARA TI</p>
+        <h1>Para ti, mi Mel</h1>
+        <p class="intro-copy">Hay algo que quiero que sepas. ❤️</p>
+      </div>
+
+      <button class="open-btn" id="openBtn" aria-expanded="false" aria-controls="envelope">
+        <span class="button-icon" aria-hidden="true">✉</span>
+        Abrir mi carta
       </button>
 
-      <div class="envelope" id="envelope" role="region" aria-live="polite" aria-label="Sobre con carta">
+      <div class="envelope" id="envelope" aria-label="Sobre con carta">
         <div class="flap"></div>
         <div class="pocket"></div>
+        <div class="seal" aria-hidden="true"></div>
 
-        <article class="letter" id="letter" tabindex="0" aria-label="Contenido de la carta">
+        <article class="letter" id="letter" tabindex="-1" aria-label="Carta de Jean Michael">
           <header class="letter__header">
-            <h1>Lo que quiero que sepas</h1>
-            <p class="muted">Con cariño, Jean </p>
+            <p class="letter-kicker">PARA TI, CON CARIÑO</p>
+            <h2>Lo que quiero que sepas</h2>
+            <p class="muted">De Jean Michael</p>
+            <div class="header-rule" aria-hidden="true">✦</div>
           </header>
 
-          <div class="letter__body" id="letterBody">
-            <!-- El contenido se inserta por JS con efecto de tipeo -->
+          <div class="letter__body" id="letterBody"></div>
+
+          <div class="letter-ending" id="letterEnding" hidden>
+            <div class="ending-star" aria-hidden="true">✧</div>
+            <p>Qué bonito fue encontrarte.</p>
+            <span>— Jean</span>
           </div>
 
           <footer class="letter__footer">
-            <div class="controls">
-              <button id="replay" class="ghost-btn" title="Reproducir de nuevo">🔄️</button>
-                          
-             
-            </div>
+            <button id="replay" class="ghost-btn" type="button" aria-label="Volver a reproducir la carta">↻ <span>Leer de nuevo</span></button>
+            <button id="showAll" class="ghost-btn" type="button">Leer completa</button>
           </footer>
         </article>
       </div>
 
-      <p class="hint">♥</p>
+      <p class="bottom-note">Hecho especialmente para ti <span>♥</span></p>
     </section>
   </main>
-
-  <noscript>
-    <style>
-      .open-btn{display:none}
-      .letter{opacity:1;transform:none}
-    </style>
-    <div style="max-width:680px;margin:2rem auto;padding:1rem;border:1px solid #ddd;background:#fff">
-      <h2>Lo que quiero que sepas</h2>
-      <p>
-        No quería dejar que esto terminara sin decirte, con calma y de corazón, lo que significaste para mí.
-      </p>
-    </div>
-  </noscript>
-
- 
-  <script src="script.js?v=4"></script>
+  <script src="script.js"></script>
 </body>
 </html>
-
-
