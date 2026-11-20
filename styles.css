@@ -90,6 +90,13 @@ button { font: inherit; }
   z-index: 5;
 }
 .open-btn:active { transform: scale(.98); }
+.open-btn.is-hidden {
+  opacity: 0;
+  transform: translateY(-8px) scale(.97);
+  pointer-events: none;
+  transition: opacity .24s ease, transform .24s ease;
+}
+.open-btn[hidden] { display: none !important; }
 .open-btn:hover { box-shadow: 0 12px 32px rgba(0,0,0,.34), 0 0 32px rgba(188,201,255,.2); }
 .button-icon { margin-right: 8px; }
 

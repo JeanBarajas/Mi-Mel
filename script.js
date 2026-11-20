@@ -93,7 +93,10 @@ function openLetter() {
   if (envelope.classList.contains("open")) return;
   envelope.classList.add("open");
   openBtn.setAttribute("aria-expanded", "true");
-  openBtn.textContent = "Carta abierta ❤️";
+  openBtn.classList.add("is-hidden");
+  window.setTimeout(() => {
+    openBtn.hidden = true;
+  }, 260);
   startTyping();
   window.setTimeout(() => {
     letter.focus({ preventScroll: true });
