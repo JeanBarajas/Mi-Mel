@@ -5,7 +5,7 @@ Me encantaste. Me gustó tu forma de ser, tu manera de pensar, tu inteligencia, 
 
 Y sí, me habría encantado conocerte, abrazarte, salir contigo y descubrir cómo sería estar juntos en persona. No eras simplemente alguien con quien hablaba para pasar el rato. Me ilusionaba saber de ti, compartir mis días contigo y sentirte cerca, incluso estando tan lejos. Me acompañaste durante todo este tiempo de una forma que quizá no alcanzas a dimensionar, y hubo momentos en los que hiciste mis días mucho más bonitos sin siquiera proponértelo.
 
-Si alguna vez te preguntaste qué quería contigo, o si de verdad había un interés de mi parte, quiero despejar esa duda: sí lo había. Me gustabas muchísimo y tenía ilusión de que algún día pudiéramos convertir todo esto en algo real. No puedo decirte que sabía cómo iba a salir, porque la verdad es que nunca tuvimos la oportunidad de descubrirlo; pero sí sé que quería intentarlo y que mi interés no era un juego ni algo pasajero.
+Si alguna vez te preguntaste qué quería contigo, o si de verdad había un interés de mi parte, quiero despejar esa duda: sí lo había. Me gustabas muchísimo y tenía ilusión de que algún día pudiéramos convertir todo esto en algo real. No puedo decirte que sabía cómo iba a salir, porque la verdad es que nunca tuvimos la oportunidad de descubrirlo pero sí sé que quería intentarlo y que mi interés no era un juego ni algo pasajero.
 
 También entiendo que la distancia pesa. Barranquilla y Bogotá no son precisamente cerca, y por más bonito que sea lo que uno siente, mantener una conexión así puede volverse difícil. Entiendo que te hayas cansado de sentir que eras tú quien insistía, y no quiero que te quedes con la sensación de que no me importabas o de que estabas sintiendo algo sola. Lamento si mis silencios, mis tiempos o mi manera de estar presente te hicieron dudar de eso. Quizá no supe cuidar esta conexión como debía.
 
@@ -15,9 +15,9 @@ Me encantaría que algún día la vida nos diera la oportunidad de conocernos. N
 
 Gracias por acompañarme durante este tiempo, por tus conversaciones, tu cariño y por todo lo bonito que despertaste en mí. Me quedo con mucho aprecio por ti y con la tranquilidad de haberte dicho la verdad.
 
-Te quiero mucho. ❤️
+Te quiero mucho, mucho, mucho mi Mel. ❤️
 
-Jean Michael`;
+Jean `;
 
 /* ================== REFERENCIAS DEL DOM ================== */
 const openBtn = document.getElementById('openBtn');
